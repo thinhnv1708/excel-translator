@@ -5,7 +5,7 @@ const workbook = new ExcelJS.Workbook();
 
 
 const main = async () => {
-    const data = await workbook.xlsx.readFile('./asset/test.xlsx');
+    const data = await workbook.xlsx.readFile('../assets/traslated/ok.xlsx');
     const worksheet = data.getWorksheet()
 
 
@@ -17,36 +17,34 @@ const main = async () => {
                 const address = cell.address
 
 
-                translateArr.push(`${cell.address} ${cell.value}`.trim())
+                translateArr.push(`${cell.address}- ${cell.value}`.trim())
             })
         }
     })
 
+    const text = translateArr.join('$$')
+    const x = await translate(text, { from: 'vi', to: 'en' })
+    console.log(x);
 
 
-    // console.log(translateArr.join(','));
-    // const text = translateArr.join(',')
-    // const x = await translate(text, { from: 'vi', to: 'en' })
-    // console.log(x);
-    const x = 'A3 me,B3 name,C3 is,D3 cat,E3 dog,F3 pig,G3 chicken,H3 goat,I3 electronic,J3 phone,K3 how is it,L3 house,M3 pagoda,N3 river,A4 advertisement, B4 okay, C4 happen, D4 milk'
+    // const y = x.split(',')
 
-    const y = x.split(',')
+    // // console.log(y);
 
-    // console.log(y);
+    // // console.log(worksheet.getCell('A2').value);
 
-    // console.log(worksheet.getCell('A2').value);
-
-    y.forEach(item => {
-        const arrayItem = item.trim().split(' ')
-        const cellName = arrayItem.shift()
-        const value = arrayItem.join(' ')
-        if (cellName) {
-            worksheet.getCell(cellName).value = value
-        }
-    })
+    // y.forEach(item => {
+    //     const arrayItem = item.trim().split(' ')
+    //     const cellName = arrayItem.shift()
+    //     const value = arrayItem.join(' ')
+    //     if (cellName) {
+    //         const curentValue = worksheet.getCell(cellName).value
+    //         worksheet.getCell(cellName).value = `${curentValue} (${value})`
+    //     }
+    // })
 
 
-    data.xlsx.writeFile('./asset/ok.xlsx')
+    // data.xlsx.writeFile('../assets/traslated/ok.xlsx')
 }
 
 main()

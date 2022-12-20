@@ -1,0 +1,3 @@
+module.exports = {
+    HANDLE_TRANSLATE_FILE: 'HANDLE_TRANSLATE_FILE',
+}

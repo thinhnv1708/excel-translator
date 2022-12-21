@@ -3,9 +3,8 @@ const express = require('express')
 const connectDataBase = require('./mongoose')
 const { HTTP_CODE } = require('./common/constant')
 const { commonMessage } = require('./common/message')
-const { mainRouter } = require('./router')
-var bodyParser = require('body-parser')
-
+const { excelFileRouter } = require('./router')
+const bodyParser = require('body-parser')
 
 connectDataBase().then(() => {
 
@@ -14,7 +13,7 @@ connectDataBase().then(() => {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
 
-    app.use('/main', mainRouter)
+    app.use('/excel-file', excelFileRouter)
 
     app.use((req, res, next) => {
         return res.status(HTTP_CODE.NOT_FOUND).json({

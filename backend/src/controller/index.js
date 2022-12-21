@@ -1,5 +1,5 @@
-const mainController = require('./main.controller')
+const excelFileController = require('./excel-file.controller')
 
 module.exports = {
-    mainController
+    excelFileController
 }

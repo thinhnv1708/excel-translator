@@ -1,5 +1,5 @@
 module.exports = {
-    DB: process.env.DB || 'notification-online',
+    DB: process.env.DB,
     USERNAME: process.env.DB_USER,
     PASSWORD: process.env.DB_PASS,
     REPL: process.env.DB_REPLS,

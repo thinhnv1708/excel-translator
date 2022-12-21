@@ -1,5 +1,5 @@
-const mainRouter = require('./main.route.js')
+const excelFileRouter = require('./excel-file.route.js')
 
 module.exports = {
-    mainRouter
+    excelFileRouter
 };

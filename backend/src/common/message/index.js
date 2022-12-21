@@ -1,6 +1,6 @@
 const commonMessage = require('./common.message')
-const mainMessage = require('./main.message')
+const excelFileMessage = require('./excel-file.message')
 module.exports = {
     commonMessage,
-    mainMessage
+    excelFileMessage
 }

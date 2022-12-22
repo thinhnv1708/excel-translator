@@ -3,7 +3,7 @@ const express = require('express')
 const connectDataBase = require('./mongoose')
 const { HTTP_CODE } = require('./common/constant')
 const { commonMessage } = require('./common/message')
-const { excelFileRouter } = require('./router')
+const { excelFileRouter, authRouter } = require('./router')
 const bodyParser = require('body-parser')
 
 connectDataBase().then(() => {
@@ -12,7 +12,8 @@ connectDataBase().then(() => {
     app.use(express.static('assets'))
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
-
+    
+    app.use('/auth', authRouter)
     app.use('/excel-file', excelFileRouter)
 
     app.use((req, res, next) => {
@@ -23,6 +24,7 @@ connectDataBase().then(() => {
 
     app.use((err, req, res, next) => {
         console.error(err.stack)
+        console.log(err);
         return res.status(HTTP_CODE.INTERNAL_ERROR).json({
             message: commonMessage.INTERNAL_ERROR
         })

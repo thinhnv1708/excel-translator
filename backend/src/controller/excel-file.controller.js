@@ -1,7 +1,7 @@
 const { HTTP_CODE } = require('../common/constant')
 const { excelFileMessage } = require('../common/message')
 const { excelFileService } = require('../service')
-const path = require('path')
+
 const getExcelFiles = async (req, res) => {
 
     const excelFiles = await excelFileService.getExcelFiles(req.query)
@@ -32,15 +32,14 @@ const handleImportExcel = async (req, res) => {
 }
 
 const dowloadOriginalFile = async (req, res) => {
-    const { originalFile, title } = req.excelFile
-    const fileUrl = path.resolve(__dirname, `../../../assets/uploads/${originalFile}`)
+    const { title } = req.excelFile
+    const fileUrl = req.fileUrl
     return res.download(fileUrl, title + '.xlsx')
 }
 
 const dowloadTranslatedFile = async (req, res) => {
-    const { translattedFile, title } = req.excelFile
-    const fileUrl = path.resolve(__dirname, `../../../assets/translated/${translattedFile}`)
-
+    const { title } = req.excelFile
+    const fileUrl = req.fileUrl
     return res.download(fileUrl, title + '.xlsx')
 }
 

@@ -63,11 +63,14 @@ const originalFileExist = async (req, res, next) => {
 
     const fileUrl = path.resolve(__dirname, `../../../assets/uploads/${originalFile}`)
 
+
     if (!checkFileExistsSync(fileUrl)) {
         return res.status(HTTP_CODE.BAD_REQUEST).json({
             message: excelFileMessage.FILE_DOES_NOT_EXIST
         })
     }
+
+    req.fileUrl = fileUrl
 
     return next()
 }
@@ -84,6 +87,8 @@ const translatedFileExist = async (req, res, next) => {
             message: excelFileMessage.FILE_DOES_NOT_EXIST
         })
     }
+
+    req.fileUrl = fileUrl
 
     return next()
 }

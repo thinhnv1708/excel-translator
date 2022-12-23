@@ -1,115 +1,143 @@
 import React, { useEffect, useState } from 'react';
 import { Table } from 'antd';
 import qs from 'qs';
+import axios from 'axios';
+import moment from 'moment';
+import { Button } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+import { axiosRequest } from '../../net-work';
 
-// interface DataType {
-//     name: {
-//         first: string;
-//         last: string;
-//     };
-//     gender: string;
-//     email: string;
-//     login: {
-//         uuid: string;
-//     };
-// }
+const STATE_MAP = {
+	PROCESSING: 'Đang xử lý',
+	SUCCESS: 'Đã dịch xong',
+	ERROR: 'Xảy ra lỗi',
+};
 
-// interface TableParams {
-//     pagination?: TablePaginationConfig;
-//     sortField?: string;
-//     sortOrder?: string;
-//     filters?: Record<string, FilterValue>;
-// }
+const onClickDowloadFile = url => {
+	console.log(url);
+	axios.get(url);
+};
 
 const columns = [
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        sorter: true,
-        render: (name) => `${name.first} ${name.last}`,
-        width: '20%',
-    },
-    {
-        title: 'Gender',
-        dataIndex: 'gender',
-        filters: [
-            { text: 'Male', value: 'male' },
-            { text: 'Female', value: 'female' },
-        ],
-        width: '20%',
-    },
-    {
-        title: 'Email',
-        dataIndex: 'email',
-    },
+	{
+		title: 'Tên tệp',
+		dataIndex: 'title',
+	},
+	{
+		title: 'Trạng thái',
+		dataIndex: 'state',
+		render: state => STATE_MAP[state],
+	},
+	{
+		title: 'Tải tệp gốc',
+		dataIndex: '_id',
+		render: id => {
+			return (
+				<Button
+					type="primary"
+					icon={<DownloadOutlined />}
+					size="small"
+					onClick={() =>
+						onClickDowloadFile(
+							`http://localhost:3001/excel-file/download-original-file/${id}`
+						)
+					}
+				>
+					Tải tệp gốc
+				</Button>
+			);
+		},
+	},
+	{
+		title: 'Tải tệp đã dịch',
+		dataIndex: '_id',
+		render: id => {
+			return (
+				<Button type="primary" icon={<DownloadOutlined />} size="small">
+					Tải tệp đã dịch
+				</Button>
+			);
+		},
+	},
+	{
+		title: 'Ngày nhập tệp',
+		dataIndex: 'createdAt',
+		render: createdAt => moment(createdAt).format('HH:MM:ss DD-MM-YYYY'),
+	},
+	{
+		title: 'Ngày cập nhật tệp',
+		dataIndex: 'updatedAt',
+		render: updatedAt => moment(updatedAt).format('HH:MM:ss DD-MM-YYYY'),
+	},
 ];
 
-const getRandomuserParams = (params) => ({
-    results: params.pagination?.pageSize,
-    page: params.pagination?.current,
-    ...params,
+const getRandomuserParams = params => ({
+	results: params.pagination?.pageSize,
+	page: params.pagination?.current,
+	...params,
 });
 
 const FileManagement = () => {
-    const [data, setData] = useState();
-    const [loading, setLoading] = useState(false);
-    const [tableParams, setTableParams] = useState({
-        pagination: {
-            current: 1,
-            pageSize: 10,
-        },
-    });
+	const [data, setData] = useState();
+	const [loading, setLoading] = useState(false);
+	const [tableParams, setTableParams] = useState({
+		pagination: {
+			current: 1,
+			pageSize: 10,
+		},
+	});
 
-    const fetchData = () => {
-        setLoading(true);
-        fetch(`https://randomuser.me/api?${qs.stringify(getRandomuserParams(tableParams))}`)
-            .then((res) => res.json())
-            .then(({ results }) => {
-                setData(results);
-                setLoading(false);
-                setTableParams({
-                    ...tableParams,
-                    pagination: {
-                        ...tableParams.pagination,
-                        total: 200,
-                        // 200 is mock data, you should read it from server
-                        // total: data.totalCount,
-                    },
-                });
-            });
-    };
+	const fetchData = async () => {
+		setLoading(true);
 
-    useEffect(() => {
-        fetchData();
-    }, [JSON.stringify(tableParams)]);
+		const { data = {}, error } = await axiosRequest({
+			url: `http://localhost:3001/excel-file?${qs.stringify(
+				getRandomuserParams(tableParams)
+			)}`,
+			method: 'get',
+		});
 
-    const handleTableChange = (
-        pagination,
-        filters,
-        sorter,
-    ) => {
-        setTableParams({
-            pagination,
-            filters,
-            ...sorter,
-        });
+		const { docs = [], totalDocs = 0 } = data;
 
-        // `dataSource` is useless since `pageSize` changed
-        if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-            setData([]);
-        }
-    };
+		setData(docs);
+		setLoading(false);
+		setTableParams({
+			...tableParams,
+			pagination: {
+				...tableParams.pagination,
+				total: totalDocs,
+			},
+		});
+	};
 
-    return (
-        <Table
-            columns={columns}
-            rowKey={(record) => record.login.uuid}
-            dataSource={data}
-            pagination={tableParams.pagination}
-            loading={loading}
-            onChange={handleTableChange}
-        />
-    );
+	useEffect(() => {
+		fetchData();
+	}, [JSON.stringify(tableParams)]);
+
+	const handleTableChange = (pagination, filters, sorter) => {
+		setTableParams({
+			pagination,
+			filters,
+			...sorter,
+		});
+
+		// `dataSource` is useless since `pageSize` changed
+		if (pagination.pageSize !== tableParams.pagination?.pageSize) {
+			setData([]);
+		}
+	};
+
+	return (
+		<Table
+			columns={columns}
+			rowKey={record => record._id}
+			dataSource={data}
+			pagination={tableParams.pagination}
+			loading={loading}
+			onChange={handleTableChange}
+			scroll={{ x: true }}
+		/>
+	);
 };
 
 export default FileManagement;

@@ -6,11 +6,13 @@ const { commonMessage } = require('./common/message');
 const { excelFileRouter, authRouter } = require('./router');
 const bodyParser = require('body-parser');
 const { initFolder } = require('./common/utils');
-initFolder()
+const cors = require('cors');
+initFolder();
 
 connectDataBase()
 	.then(() => {
 		const app = express();
+		app.use(cors());
 		app.use(express.static('assets'));
 		app.use(bodyParser.urlencoded({ extended: false }));
 		app.use(bodyParser.json());

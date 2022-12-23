@@ -5,6 +5,8 @@ const { HTTP_CODE } = require('./common/constant');
 const { commonMessage } = require('./common/message');
 const { excelFileRouter, authRouter } = require('./router');
 const bodyParser = require('body-parser');
+const { initFolder } = require('./common/utils');
+initFolder()
 
 connectDataBase()
 	.then(() => {

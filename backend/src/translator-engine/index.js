@@ -1,7 +1,7 @@
 const ExcelJS = require('exceljs');
-const { translate } = require('@vitalets/google-translate-api');
 const slug = require('slug');
 const workbook = new ExcelJS.Workbook();
+const translateRequest = require('./translate-request');
 
 const specialCaseMap = {
 	phaithutungvan: 'Receivables Tung Van',
@@ -15,7 +15,6 @@ const specialCaseMap = {
 const translatedRegex = new RegExp(/\([\w .,-_=!@#$%^&?<>"':;|\[\]{}]*\)*/g);
 const percentRegex = new RegExp(/^\d*%$/g);
 const numberRegex = new RegExp(/^\d*$/g);
-const sheetNamePrefix = 'NAME0';
 
 module.exports = async ({ originalUrl, outputUrl }) => {
 	try {
@@ -24,8 +23,7 @@ module.exports = async ({ originalUrl, outputUrl }) => {
 		const sheetMapArray = {};
 
 		data.eachSheet((workSheet, id) => {
-			const sheetName = `${workSheet.name}`.trim();
-			sheetMapArray[`${id}`] = [`${sheetNamePrefix} | ${sheetName}`];
+			sheetMapArray[`${id}`] = [];
 
 			workSheet.eachRow(row => {
 				row.eachCell(cell => {
@@ -60,11 +58,7 @@ module.exports = async ({ originalUrl, outputUrl }) => {
 
 		const keySheetMapString = Object.keys(sheetMapString);
 
-		const result = await Promise.all(
-			keySheetMapString.map(key => {
-				return translate(sheetMapString[key], { from: 'vi', to: 'en' });
-			})
-		);
+		const result = await translateRequest(keySheetMapString, sheetMapString);
 
 		result.forEach((item, index) => {
 			const { text } = item;
@@ -79,22 +73,19 @@ module.exports = async ({ originalUrl, outputUrl }) => {
 				const address = addressAndTranslatedValue[0].trim();
 				const translatedValue = addressAndTranslatedValue[1].trim();
 
-				if (address === sheetNamePrefix) {
-					const currentSheetName = worksheet.name;
-					worksheet.name = `${currentSheetName} (${translatedValue})`;
-				} else {
-					const cell = worksheet.getCell(address);
 
-					if (cell) {
-						const curentValue = `${cell.value}`.trim();
+				const cell = worksheet.getCell(address);
 
-						const translated = translatedRegex.test(curentValue);
+				if (cell) {
+					const curentValue = `${cell.value}`.trim();
 
-						if (!translated && curentValue.indexOf(`(${translatedValue})`) < 0) {
-							cell.value = `${curentValue} (${translatedValue})`;
-						}
+					const translated = translatedRegex.test(curentValue);
+
+					if (!translated && curentValue.indexOf(`(${translatedValue})`) < 0) {
+						cell.value = `${curentValue} (${translatedValue})`;
 					}
 				}
+
 			});
 		});
 

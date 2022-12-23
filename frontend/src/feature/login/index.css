@@ -1,0 +1,74 @@
+.login-page {
+  padding-top: 10vh;
+  padding-bottom: 10vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cover-form {
+  width: 15vw;
+  min-width: 310px;
+  height: 80vh;
+}
+
+.login-page-form {
+  justify-content: center;
+  border: 1px solid rgba(16,22,26,.14901960784313725);
+  border-radius: 5px;
+  padding: 20px;
+  background: #ffffff;
+  height: 235px;
+}
+
+
+.login-page-form button {
+  width: 100%;
+  background: #0f9960;
+  height: 34px;
+  color: white;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  justify-content: center;
+  padding: 5px 10px;
+  text-align: left;
+  vertical-align: middle;
+  min-height: 30px;
+  min-width: 30px;
+}
+
+.login-page-form button:hover {
+  width: 100%;
+  background: #0c7a4c;
+  height: 34px;
+  color: white;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  justify-content: center;
+  padding: 5px 10px;
+  text-align: left;
+  vertical-align: middle;
+  min-height: 30px;
+  min-width: 30px;
+}
+
+
+.login-page-form label {
+  font-weight: 600;
+  margin-bottom: 5px
+}
+
+.app-user-form-header h1 {
+  font-size: 24px;
+  font-weight: 300;
+  text-align: center;
+}

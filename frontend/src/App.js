@@ -1,15 +1,17 @@
 
 import './App.css';
+import AppLayout from './feature/app-layout';
+import Login from './feature/login';
 
 function App() {
+  const isLogin = true  
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>Nhu loz 1 </p>
-
-
-      </header>
+    <div class="app">
+      {
+        isLogin ? <AppLayout /> : <Login />
+      }
     </div>
+
   );
 }
 

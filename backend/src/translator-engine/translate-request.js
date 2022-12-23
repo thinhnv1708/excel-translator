@@ -2,7 +2,8 @@ const { translate } = require('@vitalets/google-translate-api')
 const HttpProxyAgent = require('http-proxy-agent')
 
 const proxys = [
-    'local', "http://8.210.83.33:80",
+    'local',
+    "http://8.210.83.33:80",
     "http://103.118.40.119:80",
     "http://103.167.135.111:80",
     "http://210.6.223.207:80",

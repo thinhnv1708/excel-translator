@@ -14,6 +14,13 @@ const handleImportExcel = async (req, res) => {
 			message: excelFileMessage[req.filterErrorMessage],
 		});
 	}
+
+	if (!req.file) {
+		return res.status(HTTP_CODE.BAD_REQUEST).json({
+			message: excelFileMessage.FILE_IS_REQUIRED,
+		});
+	}
+
 	const { originalname, filename } = req.file;
 
 	const body = {

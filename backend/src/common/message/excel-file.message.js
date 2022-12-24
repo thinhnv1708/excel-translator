@@ -5,4 +5,5 @@ module.exports = {
     FILE_IS_NOT_ERROR: 'Tệp không bị lỗi, không cần thử lại',
     RETRY_TRANSLATE_FILE_PROCESSING: 'Hệ thống đang xử lý tệp lại, vui lòng đợi trong ít phút',
     FILE_DOES_NOT_EXIST: 'Tải tệp thất bại, không tìm thấy tệp',
+    FILE_IS_REQUIRED: 'Vui lòng nhập tệp'
 }

@@ -14,8 +14,14 @@ connectDataBase()
 		const app = express();
 		app.use(cors());
 		app.use(express.static('assets'));
-		app.use(bodyParser.urlencoded({ extended: false }));
-		app.use(bodyParser.json());
+		app.use(
+			bodyParser.urlencoded({
+				limit: '50mb',
+				extended: true,
+				parameterLimit: 1000000,
+			})
+		);
+		app.use(bodyParser.json({ limit: '50mb' }));
 
 		app.use('/auth', authRouter);
 		app.use('/excel-file', excelFileRouter);

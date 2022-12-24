@@ -11,6 +11,7 @@ const getExcelFileById = async id => {
 
 const getExcelFiles = async query => {
 	const { title, state, page, limit } = query;
+	console.log(query);
 	return await excelFileRepository.getExcelFiles(
 		{ title, state },
 		{ page, limit }
@@ -20,8 +21,10 @@ const getExcelFiles = async query => {
 const handleImportExcelFile = async body => {
 	const { originalname, filename } = body;
 
+	const newOriginalname = Buffer.from(originalname, 'latin1').toString('utf8');
+
 	const excelFile = await excelFileRepository.createExcelFile({
-		title: originalname.replace('.xlsx', ''),
+		title: newOriginalname.replace('.xlsx', ''),
 		originalFile: filename,
 	});
 

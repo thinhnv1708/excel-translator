@@ -1,11 +1,3 @@
-/* .layout {
-    height: 100vh;
-} */
-
 .layout Header {
    padding: 16px;
-}
-
-.ant-layout-sider-children {
-    position: fixed;
 }

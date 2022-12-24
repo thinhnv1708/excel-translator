@@ -1,43 +1,42 @@
-const { HTTP_CODE } = require("../common/constant")
-const { authMessage } = require("../common/message")
-const { authService } = require("../service")
+const { HTTP_CODE } = require('../common/constant');
+const { authMessage } = require('../common/message');
+const { authService } = require('../service');
 
 const loginValidation = (req, res, next) => {
-    const { username, password } = req.body
+	const { username, password } = req.body;
+	console.log(req.body);
+	if (!username || !password) {
+		return res.status(HTTP_CODE.BAD_REQUEST).json({
+			message: authMessage.USERNAME_PASSWORD_REQUIRED,
+		});
+	}
 
-    if (!username || !password) {
-        return res.status(HTTP_CODE.BAD_REQUEST).json({
-            message: authMessage.USERNAME_PASSWORD_REQUIRED
-        })
-    }
-
-    return next()
-}
+	return next();
+};
 
 const authentication = (req, res, next) => {
-    const token = req.headers['x-access-token']
-    return next()
-    if (!token) {
-        return res.status(HTTP_CODE.UNAUTHORIZED).json({
-            message: authMessage.TOKEN_REQUIRED
-        })
-    }
+	const token = req.headers['x-access-token'];
 
-    const decode = authService.authentication(token)
+	if (!token) {
+		return res.status(HTTP_CODE.UNAUTHORIZED).json({
+			message: authMessage.TOKEN_REQUIRED,
+		});
+	}
 
-    if (!decode) {
-        return res.status(HTTP_CODE.UNAUTHORIZED).json({
-            message: authMessage.TOKEN_INVALID
-        })
-    }
+	const decode = authService.authentication(token);
 
-    req.user = decode
+	if (!decode) {
+		return res.status(HTTP_CODE.UNAUTHORIZED).json({
+			message: authMessage.TOKEN_INVALID,
+		});
+	}
 
-    return next()
-}
+	req.user = decode;
+
+	return next();
+};
 
 module.exports = {
-    loginValidation,
-    authentication
-}
-
+	loginValidation,
+	authentication,
+};

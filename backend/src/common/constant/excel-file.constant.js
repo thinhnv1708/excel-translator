@@ -1,7 +1,7 @@
 module.exports = {
     STATE: {
-        SUCCESS: 'SUCCESS',
-        ERROR: 'ERROR',
-        PROCESSING: 'PROCESSING'
+        SUCCESS: 'success',
+        ERROR: 'error',
+        PROCESSING: 'processing'
     }
 }

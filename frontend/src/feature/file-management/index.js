@@ -1,46 +1,62 @@
 import React, { useEffect, useState } from 'react';
-import { Table } from 'antd';
-import qs from 'qs';
-import axios from 'axios';
+import './index.css';
+import { Table, Badge } from 'antd';
 import moment from 'moment';
-import { Button } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
-import { axiosRequest } from '../../net-work';
+import { Button, Space, Form, Input, Select, Upload, message } from 'antd';
+import {
+	DownloadOutlined,
+	ReloadOutlined,
+	SearchOutlined,
+	UploadOutlined,
+} from '@ant-design/icons';
+import { axiosRequest, downloadFile, getUploadProps } from '../../net-work';
+import StateEventEmiter from '../../state-event-emiter';
+const stateEventEmiter = StateEventEmiter.getInstance();
 
 const STATE_MAP = {
-	PROCESSING: 'Đang xử lý',
-	SUCCESS: 'Đã dịch xong',
-	ERROR: 'Xảy ra lỗi',
+	processing: { status: 'processing', text: 'Đang xử lý' },
+	success: { status: 'success', text: 'Dịch thành công' },
+	error: { status: 'error', text: 'Xảy ra lỗi' },
 };
 
-const onClickDowloadFile = url => {
-	console.log(url);
-	axios.get(url);
+const stateOptions = [
+	{ value: 'processing', label: 'Đang xử lý' },
+	{ value: 'success', label: 'Dịch thành công' },
+	{ value: 'error', label: 'Xảy ra lỗi' },
+];
+
+const onClickDowloadFile = ({ path, fileName }) => {
+	downloadFile({ path, fileName });
 };
 
 const columns = [
 	{
 		title: 'Tên tệp',
 		dataIndex: 'title',
+		filteredValue: {},
 	},
 	{
 		title: 'Trạng thái',
 		dataIndex: 'state',
-		render: state => STATE_MAP[state],
+		render: state => {
+			const { status, text } = STATE_MAP[state];
+			return <Badge status={status} text={text} />;
+		},
 	},
 	{
 		title: 'Tải tệp gốc',
 		dataIndex: '_id',
-		render: id => {
+		render: (id, record) => {
 			return (
 				<Button
 					type="primary"
 					icon={<DownloadOutlined />}
 					size="small"
 					onClick={() =>
-						onClickDowloadFile(
-							`http://localhost:3001/excel-file/download-original-file/${id}`
-						)
+						onClickDowloadFile({
+							path: `/excel-file/download-original-file/${id}`,
+							fileName: record.title,
+						})
 					}
 				>
 					Tải tệp gốc
@@ -51,9 +67,19 @@ const columns = [
 	{
 		title: 'Tải tệp đã dịch',
 		dataIndex: '_id',
-		render: id => {
+		render: (id, record) => {
 			return (
-				<Button type="primary" icon={<DownloadOutlined />} size="small">
+				<Button
+					type="primary"
+					icon={<DownloadOutlined />}
+					size="small"
+					onClick={() =>
+						onClickDowloadFile({
+							path: `/excel-file/download-translated-file/${id}`,
+							fileName: record.title,
+						})
+					}
+				>
 					Tải tệp đã dịch
 				</Button>
 			);
@@ -69,74 +95,156 @@ const columns = [
 		dataIndex: 'updatedAt',
 		render: updatedAt => moment(updatedAt).format('HH:MM:ss DD-MM-YYYY'),
 	},
+	{
+		title: 'Thử lại',
+		dataIndex: '_id',
+		render: (id, record) => {
+			return (
+				<Button
+					type="primary"
+					icon={<ReloadOutlined />}
+					size="small"
+					onClick={() =>
+						axiosRequest({
+							path: `/excel-file/retry/${id}`,
+							method: 'post',
+						})
+					}
+				>
+					Thử lại
+				</Button>
+			);
+		},
+	},
 ];
-
-const getRandomuserParams = params => ({
-	results: params.pagination?.pageSize,
-	page: params.pagination?.current,
-	...params,
-});
 
 const FileManagement = () => {
 	const [data, setData] = useState();
 	const [loading, setLoading] = useState(false);
-	const [tableParams, setTableParams] = useState({
-		pagination: {
-			current: 1,
-			pageSize: 10,
-		},
+	const [params, setParams] = useState({
+		title: '',
+		state: '',
+		page: 1,
+		limit: 20,
 	});
+	const [totalDocs, setTotalDocs] = useState(0);
 
 	const fetchData = async () => {
+		console.log('vao dya');
 		setLoading(true);
-
-		const { data = {}, error } = await axiosRequest({
-			url: `http://localhost:3001/excel-file?${qs.stringify(
-				getRandomuserParams(tableParams)
-			)}`,
+		console.log(params);
+		const { data = {} } = await axiosRequest({
+			path: `/excel-file`,
 			method: 'get',
+			params,
 		});
 
 		const { docs = [], totalDocs = 0 } = data;
 
 		setData(docs);
+		setTotalDocs(totalDocs);
 		setLoading(false);
-		setTableParams({
-			...tableParams,
-			pagination: {
-				...tableParams.pagination,
-				total: totalDocs,
-			},
-		});
 	};
 
 	useEffect(() => {
 		fetchData();
-	}, [JSON.stringify(tableParams)]);
+	}, [JSON.stringify(params)]);
 
-	const handleTableChange = (pagination, filters, sorter) => {
-		setTableParams({
-			pagination,
-			filters,
-			...sorter,
-		});
+	const handleTableChange = pagination => {
+		const { current, pageSize } = pagination;
+
+		setParams({ ...params, page: current, limit: pageSize });
 
 		// `dataSource` is useless since `pageSize` changed
-		if (pagination.pageSize !== tableParams.pagination?.pageSize) {
+		if (pageSize !== params.limit) {
 			setData([]);
 		}
 	};
 
+	const onFinish = values => {
+		setParams({ ...params, ...values });
+	};
+
+	const onValuesChange = values => {
+		const { state } = values;
+		setParams({ ...params, state });
+	};
+
+	const uploadOnChange = result => {
+		const response = result.file.response;
+		const error = result.file.error;
+
+		const resMessage = response?.message;
+
+		if (error) {
+			const { status } = error;
+
+			if (status === 401) {
+				stateEventEmiter.emit('logout');
+			}
+
+			if (resMessage) {
+				message.error(resMessage);
+			}
+		} else {
+			if (resMessage) {
+				message.success(resMessage);
+			}
+
+			fetchData();
+		}
+	};
+
 	return (
-		<Table
-			columns={columns}
-			rowKey={record => record._id}
-			dataSource={data}
-			pagination={tableParams.pagination}
-			loading={loading}
-			onChange={handleTableChange}
-			scroll={{ x: true }}
-		/>
+		<Space direction="vertical" style={{ width: '100%' }}>
+			<Form
+				layout="inline"
+				style={{ margin: '16px' }}
+				onFinish={onFinish}
+				onValuesChange={onValuesChange}
+			>
+				<Form.Item name="title" label="Tên tệp" defaultValue="">
+					<Input allowClear placeholder="" />
+				</Form.Item>
+				<Form.Item name="state" label="Trạng thái" defaultValue="">
+					<Select style={{ minWidth: '150px' }} allowClear options={stateOptions} />
+				</Form.Item>
+				<Form.Item>
+					<Button htmlType="submit" type="primary" icon={<SearchOutlined />}>
+						Tìm kiếm
+					</Button>
+				</Form.Item>
+				<Button type="primary" icon={<ReloadOutlined />} onClick={fetchData} />
+				<Upload
+					{...getUploadProps({
+						path: '/excel-file/import-excel',
+						name: 'file',
+						onChange: uploadOnChange,
+					})}
+				>
+					<Button
+						type="primary"
+						style={{ marginLeft: '16px', background: '#0c7a4c', color: 'white' }}
+						icon={<UploadOutlined />}
+					>
+						Upload
+					</Button>
+				</Upload>
+			</Form>
+			<Table
+				columns={columns}
+				rowKey={record => record._id}
+				dataSource={data}
+				pagination={{
+					current: params.page,
+					pageSize: params.limit,
+					total: totalDocs,
+				}}
+				loading={loading}
+				onChange={handleTableChange}
+				scroll={{ x: true }}
+			/>
+		</Space>
 	);
 };
 

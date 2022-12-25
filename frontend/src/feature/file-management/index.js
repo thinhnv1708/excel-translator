@@ -99,8 +99,10 @@ const columns = [
 		title: 'Thử lại',
 		dataIndex: '_id',
 		render: (id, record) => {
+			const { state } = record;
 			return (
 				<Button
+					disabled={state === STATE_MAP.error.status ? false : true}
 					type="primary"
 					icon={<ReloadOutlined />}
 					size="small"
@@ -130,9 +132,8 @@ const FileManagement = () => {
 	const [totalDocs, setTotalDocs] = useState(0);
 
 	const fetchData = async () => {
-		console.log('vao dya');
 		setLoading(true);
-		console.log(params);
+
 		const { data = {} } = await axiosRequest({
 			path: `/excel-file`,
 			method: 'get',
@@ -148,7 +149,16 @@ const FileManagement = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, [JSON.stringify(params)]);
+	}, [params]);
+
+	useEffect(() => {
+		const intervalFetchData = setInterval(() => {
+			fetchData();
+		}, 30000);
+		return () => {
+			clearInterval(intervalFetchData);
+		};
+	}, []);
 
 	const handleTableChange = pagination => {
 		const { current, pageSize } = pagination;

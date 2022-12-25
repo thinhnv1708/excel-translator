@@ -6,8 +6,9 @@ const { JWT_SECRET, JWT_EXPIRES_IN } = appConfig;
 const users = [
 	{
 		id: 1,
-		username: 'admin',
-		password: 'admin',
+		name: 'Hà Minh Anh',
+		username: 'haminhanh',
+		password: 'comanhxinh',
 	},
 ];
 
@@ -28,6 +29,7 @@ const login = (username, password) => {
 
 	return {
 		data: {
+			name: user.name,
 			username,
 			token: jwt.sign({ sub: user.id, username: user.username }, JWT_SECRET, {
 				expiresIn: JWT_EXPIRES_IN,

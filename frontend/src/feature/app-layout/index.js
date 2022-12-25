@@ -1,35 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import './index.css';
 import {
 	DashboardOutlined,
-	MenuFoldOutlined,
 	FileExcelOutlined,
+	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, theme, Space, Button } from 'antd';
+import { Button, Layout, Menu, Space, theme } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
-import FileManagement from '../file-management';
-import { Switch, Route, Link } from 'react-router-dom';
-import Dashboard from '../dashboard';
+import React, { useState } from 'react';
+import { Link, Route, Switch, useLocation } from 'react-router-dom';
 import StateEventEmiter from '../../state-event-emiter';
+import Dashboard from '../dashboard';
+import FileManagement from '../file-management';
+import './index.css';
+
 const stateEventEmiter = StateEventEmiter.getInstance();
 
 const { Header, Sider, Content } = Layout;
 
 const AppLayout = () => {
 	const [collapsed, setCollapsed] = useState(false);
-	const [userInfo, setUserInfo] = useState(null);
+
 	const {
 		token: { colorBgContainer },
 	} = theme.useToken();
 
-	useEffect(() => {
-		const userInfoString = localStorage.getItem('userInfo');
+	const userInfoString = localStorage.getItem('userInfo');
 
-		if (userInfoString) {
-			setUserInfo(JSON.parse(userInfoString));
-		}
-	}, []);
+	const userInfo = userInfoString ? JSON.parse(userInfoString) : null;
 
 	const onClickLogout = () => {
 		stateEventEmiter.emit('logout');
@@ -42,31 +39,28 @@ const AppLayout = () => {
 				<Menu
 					theme="dark"
 					mode="inline"
-					defaultSelectedKeys={['1']}
-					// items={[
-					// 	{
-					// 		key: '1',
-					// 		icon:  <DashboardOutlined />,
-					// 		label: 'Bảng điều khiển',
-					// 		// onClick: () => navRouter.push('/'),
-					// 	},
-					// 	{
-					// 		key: '2',
-					// 		icon: <FileExcelOutlined />,
-					// 		label: 'Quản lý tệp',
-					// 		// onClick: () => navRouter.push('/file-management'),
-					// 	},
-					// ]}
-				>
-					<Menu.Item key="1" icon={<DashboardOutlined />}>
-						<Link to="/">
-							<span className="nav-text">Bảng điều khiển</span>
-						</Link>
-					</Menu.Item>
-					<Menu.Item key="2" icon={<FileExcelOutlined />}>
-						<Link to="/file-management">Quản lý tệp</Link>
-					</Menu.Item>
-				</Menu>
+					defaultSelectedKeys={[useLocation().pathname]}
+					items={[
+						{
+							key: '/',
+							icon: (
+								<Link to="/">
+									<DashboardOutlined />
+								</Link>
+							),
+							label: 'Bảng điều khiển',
+						},
+						{
+							key: '/file-management',
+							icon: (
+								<Link to="/file-management">
+									<FileExcelOutlined />
+								</Link>
+							),
+							label: 'Quản lý tệp',
+						},
+					]}
+				/>
 			</Sider>
 			<Layout className="site-layout">
 				<Header
@@ -88,7 +82,7 @@ const AppLayout = () => {
 					<Space direction="vertical">
 						{userInfo ? (
 							<Space>
-								<Space style={{ fontWeight: 600 }}>{userInfo?.username}</Space>{' '}
+								<Space style={{ fontWeight: 600 }}>{userInfo?.name}</Space>{' '}
 								<Button
 									type="ghost"
 									style={{ color: 'red', fontWeight: 600 }}
@@ -106,6 +100,7 @@ const AppLayout = () => {
 					style={{
 						minHeight: 280,
 						background: colorBgContainer,
+						padding: '16px',
 					}}
 				>
 					<Switch>

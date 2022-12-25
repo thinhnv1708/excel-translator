@@ -10,6 +10,11 @@ router.get(
 	excelFileController.getExcelFiles
 );
 router.get(
+	'/get-number-of-docs',
+	authMiddleware.authentication,
+	excelFileController.getNumberOfDocs
+);
+router.get(
 	'/download-original-file/:id',
 	authMiddleware.authentication,
 	excelFileMiddleware.excelFileExists,

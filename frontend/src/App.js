@@ -24,7 +24,7 @@ function App() {
 		if (!token) {
 			setIsLogin(false);
 		}
-		console.log('vao day');
+
 		axiosRequest({
 			path: '/auth/get-me-info',
 			method: 'get',

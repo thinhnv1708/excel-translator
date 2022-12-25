@@ -1,5 +1,5 @@
 import { Button, Form, Input } from 'antd';
-
+import './index.css';
 import StateEventEmiter from '../../state-event-emiter';
 import { axiosRequest } from '../../net-work';
 const stateEventEmiter = StateEventEmiter.getInstance();
@@ -14,7 +14,7 @@ const LoginForm = () => {
 	const onFinished = async form => {
 		const { username, password } = form;
 
-		const { error, data } = await axiosRequest({
+		const { data } = await axiosRequest({
 			path: '/auth/login',
 			method: 'post',
 			data: {
@@ -24,9 +24,9 @@ const LoginForm = () => {
 		});
 
 		if (data) {
-			const { token, username } = data;
+			const { token, username, name } = data;
 			localStorage.setItem('token', token);
-			localStorage.setItem('userInfo', JSON.stringify({ username }));
+			localStorage.setItem('userInfo', JSON.stringify({ name, username }));
 			stateEventEmiter.emit('login');
 		}
 	};

@@ -55,10 +55,17 @@ const retryTranslateFile = async (req, res) => {
 	});
 };
 
+const getNumberOfDocs = async (req, res) => {
+	const result = await excelFileService.getNumberOfDocs();
+
+	return res.json(result);
+};
+
 module.exports = {
 	getExcelFiles,
 	handleImportExcel,
 	dowloadOriginalFile,
 	dowloadTranslatedFile,
 	retryTranslateFile,
+	getNumberOfDocs,
 };

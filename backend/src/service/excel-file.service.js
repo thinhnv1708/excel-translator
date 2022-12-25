@@ -4,6 +4,7 @@ const MyEvent = require('../event');
 const myEvent = MyEvent.getInstance();
 const translatorEngine = require('../translator-engine');
 const path = require('path');
+const { STATE } = require('../common/constant/excel-file.constant');
 
 const getExcelFileById = async id => {
 	return await excelFileRepository.getExcelFileById(id);
@@ -11,7 +12,7 @@ const getExcelFileById = async id => {
 
 const getExcelFiles = async query => {
 	const { title, state, page, limit } = query;
-	console.log(query);
+
 	return await excelFileRepository.getExcelFiles(
 		{ title, state },
 		{ page, limit }
@@ -81,6 +82,33 @@ const handleTranslateFile = async (id, originalFile) => {
 	}
 };
 
+const getNumberOfDocs = async () => {
+	const [total, processing, success, error] = await Promise.all([
+		excelFileRepository.countDocs(),
+		excelFileRepository.countDocs(STATE.PROCESSING),
+		excelFileRepository.countDocs(STATE.SUCCESS),
+		excelFileRepository.countDocs(STATE.ERROR),
+	]);
+
+	return [
+		{
+			state: 'total',
+			value: total,
+		},
+		{
+			state: STATE.SUCCESS,
+			value: success,
+		},
+		{
+			state: STATE.PROCESSING,
+			value: processing,
+		},
+		{
+			state: STATE.ERROR,
+			value: error,
+		},
+	];
+};
 module.exports = {
 	getExcelFileById,
 	getExcelFiles,
@@ -88,4 +116,5 @@ module.exports = {
 	updateExcelFile,
 	handleTranslateFile,
 	handleRetryTranslateFile,
+	getNumberOfDocs,
 };

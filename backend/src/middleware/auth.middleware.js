@@ -4,7 +4,7 @@ const { authService } = require('../service');
 
 const loginValidation = (req, res, next) => {
 	const { username, password } = req.body;
-	console.log(req.body);
+
 	if (!username || !password) {
 		return res.status(HTTP_CODE.BAD_REQUEST).json({
 			message: authMessage.USERNAME_PASSWORD_REQUIRED,

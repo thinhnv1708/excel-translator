@@ -42,19 +42,22 @@ const axiosRequest = async ({
 	} catch (errorResponse) {
 		const { response } = errorResponse;
 
-		const { status, data } = response;
+		if (response) {
+			const { status, data } = response;
 
-		if (response.status === 401) {
-			stateEventEmiter.emit('logout');
+			if (response.status === 401) {
+				stateEventEmiter.emit('logout');
+			}
+
+			const resMessage = data?.message || null;
+
+			if (resMessage) {
+				message.error(resMessage);
+			}
+
+			return { error: { status, data } };
 		}
-
-		const resMessage = data?.message || null;
-
-		if (resMessage) {
-			message.error(resMessage);
-		}
-
-		return { error: { status, data } };
+		message.error(errorResponse.message);
 	}
 };
 
@@ -65,7 +68,6 @@ const downloadFile = async ({ path, fileName, headers = {}, params }) => {
 		const response = await axios({
 			url: `${host}${path}`,
 			method: 'get',
-			headers,
 			params,
 			responseType: 'blob',
 			headers: {
@@ -80,21 +82,26 @@ const downloadFile = async ({ path, fileName, headers = {}, params }) => {
 		return true;
 	} catch (errorResponse) {
 		const { response } = errorResponse;
-		const arrayBuffer = await response.data.arrayBuffer();
-		const buffer = Buffer.from(arrayBuffer, 'binary');
-		const responseData = JSON.parse(buffer.toString());
 
-		if (response.status === 401) {
-			stateEventEmiter.emit('logout');
+		if (response) {
+			const arrayBuffer = await response.data.arrayBuffer();
+			const buffer = Buffer.from(arrayBuffer, 'binary');
+			const responseData = JSON.parse(buffer.toString());
+
+			if (response.status === 401) {
+				stateEventEmiter.emit('logout');
+			}
+
+			const resMessage = responseData?.message || response?.message || null;
+
+			if (resMessage) {
+				message.error(resMessage);
+			}
+
+			return { error: responseData };
 		}
 
-		const resMessage = responseData?.message || response?.message || null;
-
-		if (resMessage) {
-			message.error(resMessage);
-		}
-
-		return { error: responseData };
+		message.error(errorResponse.message);
 	}
 };
 

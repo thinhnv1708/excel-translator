@@ -36,9 +36,17 @@ const updateExcelFile = async (id, body) => {
 	return await ExcelFileModel.findOneAndUpdate({ _id: id }, body);
 };
 
+const countDocs = async state => {
+	if (!state) {
+		return await ExcelFileModel.countDocuments();
+	}
+
+	return await ExcelFileModel.countDocuments({ state });
+};
 module.exports = {
 	getExcelFileById,
 	getExcelFiles,
 	createExcelFile,
 	updateExcelFile,
+	countDocs,
 };

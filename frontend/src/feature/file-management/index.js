@@ -237,7 +237,7 @@ const FileManagement = () => {
 						style={{ marginLeft: '16px', background: '#0c7a4c', color: 'white' }}
 						icon={<UploadOutlined />}
 					>
-						Upload
+						Tải tệp
 					</Button>
 				</Upload>
 			</Form>

@@ -6,6 +6,7 @@ const { commonMessage } = require('./common/message');
 const { excelFileRouter, authRouter } = require('./router');
 const bodyParser = require('body-parser');
 const { initFolder } = require('./common/utils');
+const path = require('path');
 const cors = require('cors');
 initFolder();
 
@@ -13,7 +14,8 @@ connectDataBase()
 	.then(() => {
 		const app = express();
 		app.use(cors());
-		app.use(express.static('assets'));
+		app.use(express.static(path.join(__dirname, '../public')))
+
 		app.use(
 			bodyParser.urlencoded({
 				limit: '50mb',
@@ -22,7 +24,10 @@ connectDataBase()
 			})
 		);
 		app.use(bodyParser.json({ limit: '50mb' }));
-
+		console.log('xxxxxxxxxxxxxxx', path.join(__dirname, '../public/build/index.html'));
+		app.get('/', (req, res) => {
+			return res.sendFile(path.join(__dirname, '../public/build/index.html'))
+		})
 		app.use('/auth', authRouter);
 		app.use('/excel-file', excelFileRouter);
 

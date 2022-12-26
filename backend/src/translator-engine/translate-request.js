@@ -16,7 +16,7 @@ const proxys = [
 ]
 
 
-module.exports = translateRequest = async (keySheetMapString, sheetMapString, proxyIndex = 0) => {
+const translateSheet = async (text, proxyIndex = 0) => {
     if (proxyIndex >= proxys.length) {
         throw new Error('Proxy out of index')
     }
@@ -25,28 +25,31 @@ module.exports = translateRequest = async (keySheetMapString, sheetMapString, pr
         const proxy = proxys[proxyIndex]
 
         if (proxy === 'local') {
-            const result = await Promise.all(
-                keySheetMapString.map(key => {
-                    return translate(sheetMapString[key], { from: 'vi', to: 'en' });
-                })
-            )
+            const result = await translate(text, { from: 'vi', to: 'en' });
 
             console.log('Using proxy:', proxy);
 
             return result
         } else {
             const agent = new HttpProxyAgent(proxy);
-            const result = await Promise.all(
-                keySheetMapString.map(key => {
-                    return translate(sheetMapString[key], { from: 'vi', to: 'en', fetchOptions: { agent } });
-                })
-            )
+            const result = await translate(text, { from: 'vi', to: 'en', fetchOptions: { agent } });
 
             console.log('Using proxy:', proxy);
 
             return result
         }
     } catch (error) {
-        return translateRequest(keySheetMapString, sheetMapString, proxyIndex + 1)
+        return translateRequest(text, proxyIndex + 1)
     }
+}
+
+
+module.exports = translateManyRequest = async (keySheetMapString, sheetMapString) => {
+    return await Promise.all(keySheetMapString.map(async (key) => {
+        const text = sheetMapString[key];
+
+        const result = await translateSheet(text);
+
+        return result
+    }))
 }

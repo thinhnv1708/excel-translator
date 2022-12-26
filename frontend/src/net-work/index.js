@@ -5,7 +5,7 @@ import StateEventEmiter from '../state-event-emiter';
 import { message } from 'antd';
 const stateEventEmiter = StateEventEmiter.getInstance();
 
-const host = 'http://localhost:3001';
+const host = 'http://123.30.235.187:5412';
 
 const axiosRequest = async ({
 	path,

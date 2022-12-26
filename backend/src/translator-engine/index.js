@@ -1,7 +1,7 @@
 const ExcelJS = require('exceljs');
 const slug = require('slug');
 const workbook = new ExcelJS.Workbook();
-const translateRequest = require('./translate-request');
+const translateManyRequest = require('./translate-request');
 
 const specialCaseMap = {
 	phaithutungvan: 'Receivables Tung Van',
@@ -58,7 +58,7 @@ module.exports = async ({ originalUrl, outputUrl }) => {
 
 		const keySheetMapString = Object.keys(sheetMapString);
 
-		const result = await translateRequest(keySheetMapString, sheetMapString);
+		const result = await translateManyRequest(keySheetMapString, sheetMapString);
 
 		result.forEach((item, index) => {
 			const { text } = item;

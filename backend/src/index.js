@@ -24,12 +24,14 @@ connectDataBase()
 			})
 		);
 		app.use(bodyParser.json({ limit: '50mb' }));
-		console.log('xxxxxxxxxxxxxxx', path.join(__dirname, '../public/build/index.html'));
-		app.get('/', (req, res) => {
-			return res.sendFile(path.join(__dirname, '../public/build/index.html'))
-		})
+
+
 		app.use('/auth', authRouter);
 		app.use('/excel-file', excelFileRouter);
+
+		app.get('*', (req, res) => {
+			return res.sendFile(path.join(__dirname, '../public/index.html'))
+		})
 
 		app.use((req, res, next) => {
 			return res.status(HTTP_CODE.NOT_FOUND).json({

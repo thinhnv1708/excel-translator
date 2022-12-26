@@ -23,16 +23,19 @@ function App() {
 
 		if (!token) {
 			setIsLogin(false);
+		} else {
+			axiosRequest({
+				path: '/auth/get-me-info',
+				method: 'get',
+			}).then(({ error, data }) => {
+				if (!error) {
+					setIsLogin(true);
+				}
+			});
 		}
 
-		axiosRequest({
-			path: '/auth/get-me-info',
-			method: 'get',
-		}).then(({ error, data }) => {
-			if (!error) {
-				setIsLogin(true);
-			}
-		});
+
+
 	}, []);
 
 	return <div className="app">{isLogin ? <AppLayout /> : <Login />}</div>;

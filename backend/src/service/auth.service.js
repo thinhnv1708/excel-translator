@@ -10,6 +10,12 @@ const users = [
 		username: 'haminhanh',
 		password: 'comanhxinh',
 	},
+	{
+		id: 2,
+		name: 'Quản trị viên',
+		username: 'admin',
+		password: 'admin',
+	},
 ];
 
 const login = (username, password) => {

@@ -6,6 +6,8 @@ import { message } from 'antd';
 const stateEventEmiter = StateEventEmiter.getInstance();
 
 const host = 'http://123.30.235.187:5412';
+// const host = 'http://localhost:5412';
+
 
 const axiosRequest = async ({
 	path,
@@ -113,6 +115,7 @@ const getUploadProps = ({ path, name, onChange }) => {
 		headers: { 'x-access-token': token },
 		onChange,
 		multiple: false,
+		accept: '.xlsx',
 	};
 };
 

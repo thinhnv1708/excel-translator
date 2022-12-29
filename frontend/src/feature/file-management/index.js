@@ -209,32 +209,33 @@ const FileManagement = () => {
 		<Space direction="vertical" style={{ width: '100%' }}>
 			<Form
 				layout="inline"
-				style={{ margin: '16px' }}
+				style={{ margin: '8px' }}
 				onFinish={onFinish}
 				onValuesChange={onValuesChange}
 			>
-				<Form.Item name="title" label="Tên tệp" defaultValue="">
+				<Form.Item name="title" label="Tên tệp" defaultValue="" style={{ margin: "8px" }} >
 					<Input allowClear placeholder="" />
 				</Form.Item>
-				<Form.Item name="state" label="Trạng thái" defaultValue="">
+				<Form.Item name="state" label="Trạng thái" defaultValue="" style={{ margin: "8px" }}>
 					<Select style={{ minWidth: '150px' }} allowClear options={stateOptions} />
 				</Form.Item>
-				<Form.Item>
+				<Form.Item style={{ margin: "8px" }}>
 					<Button htmlType="submit" type="primary" icon={<SearchOutlined />}>
 						Tìm kiếm
 					</Button>
 				</Form.Item>
-				<Button type="primary" icon={<ReloadOutlined />} onClick={fetchData} />
+				<Button type="primary" icon={<ReloadOutlined />} onClick={fetchData} style={{ margin: "8px" }} />
 				<Upload
 					{...getUploadProps({
 						path: '/excel-file/import-excel',
 						name: 'file',
 						onChange: uploadOnChange,
 					})}
+					style={{ margin: "8px" }}
 				>
 					<Button
 						type="primary"
-						style={{ marginLeft: '16px', background: '#0c7a4c', color: 'white' }}
+						style={{ margin: '8px', background: '#0c7a4c', color: 'white' }}
 						icon={<UploadOutlined />}
 					>
 						Tải tệp
